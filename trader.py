@@ -3,6 +3,7 @@ from typing import List, Literal, Tuple
 import math
 from dotenv import load_dotenv
 import pandas as pd
+from ta.trend import EMAIndicator
 
 from pybit.unified_trading import HTTP
 from pybit.exceptions import InvalidRequestError
@@ -102,8 +103,11 @@ def compute_ema(df: pd.DataFrame, period_fast: int, period_slow: int) -> pd.Data
         DataFrame с добавленными колонками 'ema_fast' и 'ema_slow'.
     """
     df = df.copy()
-    df['ema_fast'] = df['close'].ewm(span=period_fast, adjust=False).mean()
-    df['ema_slow'] = df['close'].ewm(span=period_slow, adjust=False).mean()
+
+    ema_fast = EMAIndicator(close=df['close'], window=period_fast).ema_indicator()
+    ema_slow = EMAIndicator(close=df['close'], window=period_slow).ema_indicator()
+    df['ema_fast'] = ema_fast
+    df['ema_slow'] = ema_slow
     return df
 
 
